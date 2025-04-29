@@ -1,46 +1,46 @@
+import { useToast } from "@/hooks/use-toast";
+import {
+  getMCPProxyAddress,
+  getMCPServerRequestMaxTotalTimeout,
+  getMCPServerRequestTimeout,
+  resetRequestTimeoutOnProgress,
+} from "@/utils/configUtils";
+import { auth } from "@modelcontextprotocol/sdk/client/auth.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import {
   SSEClientTransport,
   SseError,
 } from "@modelcontextprotocol/sdk/client/sse.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import {
+  CancelledNotificationSchema,
   ClientNotification,
   ClientRequest,
+  CompleteResultSchema,
   CreateMessageRequestSchema,
+  ErrorCode,
   ListRootsRequestSchema,
-  ResourceUpdatedNotificationSchema,
   LoggingMessageNotificationSchema,
+  McpError,
+  Progress,
+  PromptListChangedNotificationSchema,
+  PromptReference,
   Request,
+  ResourceListChangedNotificationSchema,
+  ResourceReference,
+  ResourceUpdatedNotificationSchema,
   Result,
   ServerCapabilities,
-  PromptReference,
-  ResourceReference,
-  McpError,
-  CompleteResultSchema,
-  ErrorCode,
-  CancelledNotificationSchema,
-  ResourceListChangedNotificationSchema,
   ToolListChangedNotificationSchema,
-  PromptListChangedNotificationSchema,
-  Progress,
 } from "@modelcontextprotocol/sdk/types.js";
-import { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import packageJson from "../../../package.json";
+import { InspectorOAuthClientProvider } from "../auth";
+import { InspectorConfig } from "../configurationTypes";
 import { ConnectionStatus } from "../constants";
 import { Notification, StdErrNotificationSchema } from "../notificationTypes";
-import { auth } from "@modelcontextprotocol/sdk/client/auth.js";
-import { InspectorOAuthClientProvider } from "../auth";
-import packageJson from "../../../package.json";
-import {
-  getMCPProxyAddress,
-  getMCPServerRequestMaxTotalTimeout,
-  resetRequestTimeoutOnProgress,
-} from "@/utils/configUtils";
-import { getMCPServerRequestTimeout } from "@/utils/configUtils";
-import { InspectorConfig } from "../configurationTypes";
 
 interface UseConnectionOptions {
   transportType: "stdio" | "sse" | "streamable-http";
@@ -273,35 +273,42 @@ export function useConnection({
       },
     );
 
-    try {
-      await checkProxyHealth();
-    } catch {
-      setConnectionStatus("error-connecting-to-proxy");
-      return;
-    }
-    let mcpProxyServerUrl;
-    switch (transportType) {
-      case "stdio":
-        mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/stdio`);
-        mcpProxyServerUrl.searchParams.append("command", command);
-        mcpProxyServerUrl.searchParams.append("args", args);
-        mcpProxyServerUrl.searchParams.append("env", JSON.stringify(env));
-        break;
+    // try {
+    //   await checkProxyHealth();
+    // } catch {
+    //   setConnectionStatus("error-connecting-to-proxy");
+    //   return;
+    // }
 
-      case "sse":
-        mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/sse`);
-        mcpProxyServerUrl.searchParams.append("url", sseUrl);
-        break;
+    // let mcpProxyServerUrl;
+    // switch (transportType) {
+    //   case "stdio":
+    //     mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/stdio`);
+    //     mcpProxyServerUrl.searchParams.append("command", command);
+    //     mcpProxyServerUrl.searchParams.append("args", args);
+    //     mcpProxyServerUrl.searchParams.append("env", JSON.stringify(env));
+    //     break;
 
-      case "streamable-http":
-        mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/mcp`);
-        mcpProxyServerUrl.searchParams.append("url", sseUrl);
-        break;
+    //   case "sse":
+    //     mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/sse`);
+    //     mcpProxyServerUrl.searchParams.append("url", sseUrl);
+    //     break;
+
+    //   case "streamable-http":
+    //     mcpProxyServerUrl = new URL(`${getMCPProxyAddress(config)}/mcp`);
+    //     mcpProxyServerUrl.searchParams.append("url", sseUrl);
+    //     break;
+    // }
+    // (mcpProxyServerUrl as URL).searchParams.append(
+    //   "transportType",
+    //   transportType,
+    // );
+
+    if (!sseUrl) {
+      throw new Error("SSE URL is required");
     }
-    (mcpProxyServerUrl as URL).searchParams.append(
-      "transportType",
-      transportType,
-    );
+
+    let mcpProxyServerUrl = new URL(sseUrl);
 
     try {
       // Inject auth manually instead of using SSEClientTransport, because we're
@@ -318,6 +325,8 @@ export function useConnection({
         const authHeaderName = headerName || "Authorization";
         headers[authHeaderName] = `Bearer ${token}`;
       }
+
+      headers["metorial-include-debug-messages"] = "true";
 
       // Create appropriate transport
       const transportOptions = {

@@ -21,7 +21,7 @@ const ListPane = <T extends object>({
   buttonText,
   isButtonDisabled,
 }: ListPaneProps<T>) => (
-  <div className="bg-card rounded-lg shadow">
+  <div className="bg-card rounded-lg border border-gray-200 shadow-md">
     <div className="p-4 border-b border-gray-200 dark:border-gray-800">
       <h3 className="font-semibold dark:text-white">{title}</h3>
     </div>

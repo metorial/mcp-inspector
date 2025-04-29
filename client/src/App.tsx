@@ -9,13 +9,13 @@ import {
   ListResourcesResultSchema,
   ListResourceTemplatesResultSchema,
   ListToolsResultSchema,
+  LoggingLevel,
   ReadResourceResultSchema,
   Resource,
   ResourceTemplate,
   Root,
   ServerNotification,
   Tool,
-  LoggingLevel,
 } from "@modelcontextprotocol/sdk/types.js";
 import React, {
   Suspense,
@@ -30,12 +30,11 @@ import { StdErrNotification } from "./lib/notificationTypes";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Bell,
   Files,
   FolderTree,
   Hammer,
   Hash,
-  MessageSquare,
+  MessageSquare
 } from "lucide-react";
 
 import { z } from "zod";
@@ -47,11 +46,9 @@ import PromptsTab, { Prompt } from "./components/PromptsTab";
 import ResourcesTab from "./components/ResourcesTab";
 import RootsTab from "./components/RootsTab";
 import SamplingTab, { PendingRequest } from "./components/SamplingTab";
-import Sidebar from "./components/Sidebar";
 import ToolsTab from "./components/ToolsTab";
-import { DEFAULT_INSPECTOR_CONFIG } from "./lib/constants";
 import { InspectorConfig } from "./lib/configurationTypes";
-import { getMCPProxyAddress } from "./utils/configUtils";
+import { DEFAULT_INSPECTOR_CONFIG } from "./lib/constants";
 
 const CONFIG_LOCAL_STORAGE_KEY = "inspectorConfig_v1";
 
@@ -160,7 +157,7 @@ const App = () => {
   const [nextToolCursor, setNextToolCursor] = useState<string | undefined>();
   const progressTokenRef = useRef(0);
 
-  const { height: historyPaneHeight, handleDragStart } = useDraggablePane(300);
+  const { height: historyPaneHeight, handleDragStart } = useDraggablePane(400);
 
   const {
     connectionStatus,
@@ -238,23 +235,23 @@ const App = () => {
     [connectMcpServer],
   );
 
-  useEffect(() => {
-    fetch(`${getMCPProxyAddress(config)}/config`)
-      .then((response) => response.json())
-      .then((data) => {
-        setEnv(data.defaultEnvironment);
-        if (data.defaultCommand) {
-          setCommand(data.defaultCommand);
-        }
-        if (data.defaultArgs) {
-          setArgs(data.defaultArgs);
-        }
-      })
-      .catch((error) =>
-        console.error("Error fetching default environment:", error),
-      );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   fetch(`${getMCPProxyAddress(config)}/config`)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setEnv(data.defaultEnvironment);
+  //       if (data.defaultCommand) {
+  //         setCommand(data.defaultCommand);
+  //       }
+  //       if (data.defaultArgs) {
+  //         setArgs(data.defaultArgs);
+  //       }
+  //     })
+  //     .catch((error) =>
+  //       console.error("Error fetching default environment:", error),
+  //     );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     rootsRef.current = roots;
@@ -471,6 +468,34 @@ const App = () => {
     setStdErrNotifications([]);
   };
 
+  let autoConnectedRef = useRef(false);
+  useEffect(() => {
+    if (autoConnectedRef.current) return;
+    autoConnectedRef.current = true;
+
+    let search = new URLSearchParams(window.location.search);
+
+    let transportType = search.get("transport_type");
+    let sseUrl = search.get("sse_url");
+    let bearerToken = search.get("bearer_token");
+
+  
+    if (transportType && sseUrl) {
+      setTransportType(transportType as "sse" | "streamable-http");
+      setSseUrl(sseUrl);
+
+      if (bearerToken) {
+        setBearerToken(bearerToken);
+      }
+
+      connectMcpServer()
+
+      console.log(
+        `Connected to MCP server with transportType: ${transportType}, sseUrl: ${sseUrl}, bearerToken: ${bearerToken}`,
+      );
+    }
+  }, [])
+
   if (window.location.pathname === "/oauth/callback") {
     const OAuthCallback = React.lazy(
       () => import("./components/OAuthCallback"),
@@ -484,7 +509,7 @@ const App = () => {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar
+      {/* <Sidebar
         connectionStatus={connectionStatus}
         transportType={transportType}
         setTransportType={setTransportType}
@@ -509,8 +534,9 @@ const App = () => {
         sendLogLevelRequest={sendLogLevelRequest}
         loggingSupported={!!serverCapabilities?.logging || false}
         clearStdErrNotifications={clearStdErrNotifications}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      /> */}
+
+      <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-auto">
           {mcpClient ? (
             <Tabs
@@ -552,10 +578,10 @@ const App = () => {
                   <Hammer className="w-4 h-4 mr-2" />
                   Tools
                 </TabsTrigger>
-                <TabsTrigger value="ping">
+                {/* <TabsTrigger value="ping">
                   <Bell className="w-4 h-4 mr-2" />
                   Ping
-                </TabsTrigger>
+                </TabsTrigger> */}
                 <TabsTrigger value="sampling" className="relative">
                   <Hash className="w-4 h-4 mr-2" />
                   Sampling
@@ -708,23 +734,26 @@ const App = () => {
           ) : (
             <div className="flex items-center justify-center h-full">
               <p className="text-lg text-gray-500">
-                Connect to an MCP server to start inspecting
+                {/* Connect to an MCP server to start inspecting */}
+                Connecting...
               </p>
             </div>
           )}
         </div>
+
         <div
-          className="relative border-t border-border"
+          className="relative border-l border-border h-full"
           style={{
-            height: `${historyPaneHeight}px`,
+            width: `${historyPaneHeight}px`,
           }}
         >
           <div
-            className="absolute w-full h-4 -top-2 cursor-row-resize flex items-center justify-center hover:bg-accent/50"
+            className="absolute h-full w-4 -left-2 cursor-row-resize flex items-center justify-center hover:bg-accent/50"
             onMouseDown={handleDragStart}
           >
-            <div className="w-8 h-1 rounded-full bg-border" />
+            <div className="h-8 w-1 rounded-full bg-border" />
           </div>
+
           <div className="h-full overflow-auto">
             <HistoryAndNotifications
               requestHistory={requestHistory}

@@ -1,18 +1,3 @@
-import { useState } from "react";
-import {
-  Play,
-  ChevronDown,
-  ChevronRight,
-  CircleHelp,
-  Bug,
-  Github,
-  Eye,
-  EyeOff,
-  RotateCcw,
-  Settings,
-  HelpCircle,
-  RefreshCwOff,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,20 +7,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { InspectorConfig } from "@/lib/configurationTypes";
+import { ConnectionStatus } from "@/lib/constants";
 import { StdErrNotification } from "@/lib/notificationTypes";
 import {
   LoggingLevel,
   LoggingLevelSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { InspectorConfig } from "@/lib/configurationTypes";
-import { ConnectionStatus } from "@/lib/constants";
-import useTheme from "../lib/useTheme";
-import { version } from "../../../package.json";
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+  Bug,
+  ChevronDown,
+  ChevronRight,
+  CircleHelp,
+  Eye,
+  EyeOff,
+  Github,
+  HelpCircle,
+  Play,
+  RefreshCwOff,
+  RotateCcw,
+  Settings,
+} from "lucide-react";
+import { useState } from "react";
+import { version } from "../../../package.json";
+import useTheme from "../lib/useTheme";
 
 interface SidebarProps {
   connectionStatus: ConnectionStatus;
@@ -95,6 +95,7 @@ const Sidebar = ({
   const [showBearerToken, setShowBearerToken] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [shownEnvVars, setShownEnvVars] = useState<Set<string>>(new Set());
+
 
   return (
     <div className="w-80 bg-card border-r border-border flex flex-col h-full">

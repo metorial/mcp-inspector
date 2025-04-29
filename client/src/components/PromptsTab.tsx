@@ -4,6 +4,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 
+import { useCompletionState } from "@/lib/hooks/useCompletionState";
 import {
   ListPromptsResult,
   PromptReference,
@@ -11,9 +12,8 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import ListPane from "./ListPane";
-import { useCompletionState } from "@/lib/hooks/useCompletionState";
 import JsonView from "./JsonView";
+import ListPane from "./ListPane";
 
 export type Prompt = {
   name: string;
@@ -110,7 +110,7 @@ const PromptsTab = ({
           isButtonDisabled={!nextCursor && prompts.length > 0}
         />
 
-        <div className="bg-card rounded-lg shadow">
+        <div className="bg-card rounded-lg border border-gray-200 shadow-md">
           <div className="p-4 border-b border-gray-200 dark:border-gray-800">
             <h3 className="font-semibold">
               {selectedPrompt ? selectedPrompt.name : "Select a prompt"}

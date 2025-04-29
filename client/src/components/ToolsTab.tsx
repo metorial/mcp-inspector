@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import DynamicJsonForm from "./DynamicJsonForm";
-import type { JsonValue, JsonSchemaType } from "@/utils/jsonUtils";
+import type { JsonSchemaType, JsonValue } from "@/utils/jsonUtils";
 import { generateDefaultValue } from "@/utils/schemaUtils";
 import {
   CallToolResultSchema,
@@ -16,8 +15,9 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { Loader2, Send } from "lucide-react";
 import { useEffect, useState } from "react";
-import ListPane from "./ListPane";
+import DynamicJsonForm from "./DynamicJsonForm";
 import JsonView from "./JsonView";
+import ListPane from "./ListPane";
 
 const ToolsTab = ({
   tools,
@@ -145,7 +145,7 @@ const ToolsTab = ({
           isButtonDisabled={!nextCursor && tools.length > 0}
         />
 
-        <div className="bg-card rounded-lg shadow">
+        <div className="bg-card rounded-lg border border-gray-200 shadow-md">
           <div className="p-4 border-b border-gray-200 dark:border-gray-800">
             <h3 className="font-semibold">
               {selectedTool ? selectedTool.name : "Select a tool"}

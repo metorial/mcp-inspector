@@ -1,21 +1,21 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Combobox } from "@/components/ui/combobox";
+import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
+import { useCompletionState } from "@/lib/hooks/useCompletionState";
 import {
   ListResourcesResult,
-  Resource,
-  ResourceTemplate,
   ListResourceTemplatesResult,
-  ResourceReference,
   PromptReference,
+  Resource,
+  ResourceReference,
+  ResourceTemplate,
 } from "@modelcontextprotocol/sdk/types.js";
 import { AlertCircle, ChevronRight, FileText, RefreshCw } from "lucide-react";
-import ListPane from "./ListPane";
 import { useEffect, useState } from "react";
-import { useCompletionState } from "@/lib/hooks/useCompletionState";
 import JsonView from "./JsonView";
+import ListPane from "./ListPane";
 
 const ResourcesTab = ({
   resources,
@@ -173,7 +173,7 @@ const ResourcesTab = ({
           isButtonDisabled={!nextTemplateCursor && resourceTemplates.length > 0}
         />
 
-        <div className="bg-card rounded-lg shadow">
+        <div className="bg-card rounded-lg border border-gray-200 shadow-md">
           <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
             <h3
               className="font-semibold truncate"

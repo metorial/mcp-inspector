@@ -33,7 +33,7 @@ export const DEFAULT_INSPECTOR_CONFIG: InspectorConfig = {
   MCP_SERVER_REQUEST_TIMEOUT: {
     label: "Request Timeout",
     description: "Timeout for requests to the MCP server (ms)",
-    value: 10000,
+    value: Infinity,
   },
   MCP_REQUEST_TIMEOUT_RESET_ON_PROGRESS: {
     label: "Reset Timeout on Progress",
@@ -44,7 +44,7 @@ export const DEFAULT_INSPECTOR_CONFIG: InspectorConfig = {
     label: "Maximum Total Timeout",
     description:
       "Maximum total timeout for requests sent to the MCP server (ms) (Use with progress notifications)",
-    value: 60000,
+    value: 120000,
   },
   MCP_PROXY_FULL_ADDRESS: {
     label: "Inspector Proxy Address",

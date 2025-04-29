@@ -9,7 +9,7 @@ export function useDraggablePane(initialHeight: number) {
   const handleDragStart = useCallback(
     (e: React.MouseEvent) => {
       setIsDragging(true);
-      dragStartY.current = e.clientY;
+      dragStartY.current = e.clientX;
       dragStartHeight.current = height;
       document.body.style.userSelect = "none";
     },
@@ -19,7 +19,7 @@ export function useDraggablePane(initialHeight: number) {
   const handleDragMove = useCallback(
     (e: MouseEvent) => {
       if (!isDragging) return;
-      const deltaY = dragStartY.current - e.clientY;
+      const deltaY = dragStartY.current - e.clientX;
       const newHeight = Math.max(
         100,
         Math.min(800, dragStartHeight.current + deltaY),
